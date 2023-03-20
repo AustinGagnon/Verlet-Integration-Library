@@ -79,18 +79,18 @@ def SpawnMesh():
     # Mesh Building Variables -
     x = vt.window_width / 5             # X Placement top left Mesh
     y = 10                              # Y Placement top left Mesh
-    meshSize = 40                       # Number of Columns in Mesh
+    meshSize = 30                       # Number of Columns in Mesh
     chainSize = 20                      # Number of Rows in Mesh
-    distX = 9                          # Distance between each column
-    distY = 9                          # Distance between each row
+    distX = 8                          # Distance between each column
+    distY = 12                          # Distance between each row
     radius = 0                          # Radius of Joints (Keep low for mesh)
     color = black                       # Color of Joints (Not visible for mesh)
-    swingAmt = 10                       # Adds offset to each row by adding to x start position
+    swingAmt = random.randint(0,20)                      # Adds offset to each row by adding to x start position
     CreateMesh = True
 
     for i in range(meshSize):
         vt.buildChain(chainSize, x + (i * distX), y, distY, radius, color, balls, rods, swingAmt)
-    vt.buildMesh(balls, rods, meshSize, chainSize)
+    vt.buildMesh(balls, rods, meshSize, chainSize, distX)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Build box
 # vt.buildBox(black, balls, rods)
@@ -155,7 +155,7 @@ def run():
                 ball.check_collisions(balls)
             ball.check_boarder_collisions()
 
-        for i in range(3):
+        for i in range(1):
             for rod in rods:
                 if CreateMesh or CreateSingleChain:
                     rod.mouse_collision(rods)

@@ -6,12 +6,12 @@ import math
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~ Global Variables
 # ~ Variables can be overwritten from main.py
-GRAVITY = 1.01                    # Gravity
+GRAVITY = 0.25                 # Gravity
 window_width = 500                # Width - Default 500
 window_height = 600               # Height - Default 600
-FPS = 40                          # Frames Per Second
+FPS = 80                          # Frames Per Second
 MAX_SPEED = 150                   # Caps ball movement speed
-CUT_DIST = 90                     # Defines radius of cutting distance (Higher = harder to tear)
+CUT_DIST = 120                     # Defines radius of cutting distance (Higher = harder to tear)
 TEAR_DIST = 90                    # Sets force needed to rip curtain (Higher = harder to tear)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,7 +33,7 @@ class Ball:
             temp_x = self.x
             temp_y = self.y
             temp_dX = self.x - self.prev_x
-            temp_dY = (self.y - self.prev_y) + 0.5 * GRAVITY
+            temp_dY = (self.y - self.prev_y) + GRAVITY
             if temp_dX > 0:
                 self.x += min(MAX_SPEED, temp_dX)
             else:
@@ -85,12 +85,12 @@ class Ball:
 
 # define the Rod class
 class Rod:
-    def __init__(self, ball1, ball2):
+    def __init__(self, ball1, ball2, dist):
         self.ball1 = ball1
         self.ball2 = ball2
         self.dx = self.ball2.x - self.ball1.x
         self.dy = self.ball2.y - self.ball1.y
-        self.length = ( self.dx ** 2 + self.dy ** 2) ** 0.5
+        self.length = dist
 
     def draw(self, screen):
         pygame.draw.line(screen, (0, 0, 0), (int(self.ball1.x), int(self.ball1.y)),
@@ -110,7 +110,10 @@ class Rod:
         if not self.ball2.fixed:
             self.ball2.x += dx
             self.ball2.y += dy
-
+        # self.ball1.x -= dx
+        # self.ball1.y -= dy
+        # self.ball2.x += dx
+        # self.ball2.y += dy
     def mouse_collision(self, rods):
         Mouse_X, Mouse_Y = pygame.mouse.get_pos()
         dx = self.ball2.x - self.ball1.x
@@ -139,7 +142,7 @@ def buildBalls(n, x, y, px, py, radius, withRods, balls, rods):
         if withRods:
             if i > 0:
                 l = max(0, len(balls) - 2)
-                rods.append(Rod(balls[l+i-1], balls[l+i]))
+                rods.append(Rod(balls[l+i-1], balls[l+i], radius * 3))
 
 
 def buildBox(color, balls, rods):
@@ -154,15 +157,15 @@ def buildBox(color, balls, rods):
     rods.append(Rod(balls[0], balls[3]))
     rods.append(Rod(balls[1], balls[2]))
 
-def buildChain(n, head_x, head_y, dist, radius, color, balls, rods, swing):
+def buildChain(n, head_x, head_y, distY, radius, color, balls, rods, swing):
     balls.append(Ball(head_x, head_y, head_x, head_y, radius, color, True))
     l = len(balls) - 1
     for i in range(n-1):
-        balls.append(Ball(head_x + ((i+1)*swing), head_y + ((i+1)*dist), head_x + ((i+1)*dist), head_y + ((i+1)*dist),
+        balls.append(Ball(head_x + ((i+1)*swing), head_y + ((i+1)*distY), head_x + ((i+1)*swing), head_y + ((i+1)*distY),
                           radius, color, False))
-        rods.append(Rod(balls[l+i], balls[l+i+1]))
+        rods.append(Rod(balls[l+i], balls[l+i+1], distY))
 
-def buildMesh(balls, rods, columns, rows):
+def buildMesh(balls, rods, columns, rows, dist):
     for i in range(columns-1):
         for j in range(rows):
-            rods.append(Rod(balls[(i*rows)+j], balls[(i*rows)+j+rows]))
+            rods.append(Rod(balls[(i*rows)+j], balls[(i*rows)+j+rows], dist))
